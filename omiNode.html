@@ -1,0 +1,287 @@
+<script type="text/javascript">
+    function oneditprepare() {
+        //do nothing
+    }
+    RED.nodes.registerType('omiNode',{
+        category: 'IoT standard',
+        color: '#00AFF0',
+        defaults: {
+            name: {value:""},
+            path_InfoItem: {value:"", required:true},
+            token: {value:""},
+            operations: {value:"", required:true},
+            ttl: {value:""},
+            interval: {value:""},
+            callback: {value:""},
+            newest: {value:""},
+            oldest: {value:""},
+            begin: {value:""},
+            end: {value:""},
+            value: {value:""},
+            reqID: {reqID:""},
+            metadata: {value:"false"},
+            readTypes: {value:"false"}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "feed.png",
+        label: function() {
+            return this.name||"omiNode";
+        },
+        oneditprepare: function() {
+            var oper = $("#node-input-operations").val();
+            //var oper_readTypes = $("#node-input-readTypes").val();
+            if (oper == undefined) {
+                $(".node-input-readTypes").hide();
+                //$("#node-input-readTypes").val("false");
+                $(".node-input-ttl").hide();
+                $(".node-input-interval").hide();
+                $(".node-input-callback").hide();
+                $(".node-input-lastvalues").hide();
+                $(".node-input-dates").hide();
+                $(".node-input-value").hide();
+                $(".node-input-reqID").hide();
+                $(".node-input-metadata").hide();
+            }
+        },
+        /*oneditsave: function() {
+            var type = $("#node-input-readTypes").val();
+            if (type == "subscriboooe") {
+                console.log("totoooo");
+            }
+        },*/
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+        //oneditprepare: oneditprepare
+    });
+</script>
+
+<script type="text/x-red" data-template-name="omiNode">
+    <!--<div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">-->
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" data-i18n="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-path_InfoItem"><i class="fa fa-globe"></i> Path InfoItem</label>
+        <input type="text" id="node-input-path_InfoItem" placeholder="Specify O-MI node's path">
+    </div>
+    <div class="form-row">
+        <label for="node-input-token"><i class="fa fa-unlock-alt"></i> Token</label>
+        <input type="text" id="node-input-token" placeholder="Add Token issued by IoTBnB (if any)">
+    </div>
+    <div class="form-row">
+        <label for="node-input-operations"><i class="fa fa-envelope"></i> Interface</label>
+        <select type="text" id="node-input-operations" placeholder="Toto">
+            <option value="Read">Read</option>
+            <option value="Write">Write</option>
+            <option value="Cancel">Cancel existing subcription</option>
+            <option value="Message">Raw request</option>
+        </select>
+    </div>
+    <div class="form-row node-input-readTypes">
+        <label for="node-input-readTypes"><i class="fa fa-envelope"></i> Type</label>
+        <select type="text" id="node-input-readTypes" placeholder="Titi">
+            <option value="read1time">read1time</option>
+            <option value="subscribe">subscribe</option>
+            <option value="poll">poll</option>
+            <!--<option value="Subscription">Subscription</option>-->
+        </select>
+    </div>
+    <!--<div class='form-row node-input-read1time'>
+        <label>&nbsp;</label>
+        <input type="checkbox" name="group1" id='node-input-read1time' value='read1time' style='display: inline-block; width: auto; vertical-align: top;'>
+        <label for='node-input-read1time' style='width: 70%;'>Read one time</label>
+    </div>
+    <div class='form-row node-input-subscribe'>
+        <label>&nbsp;</label>
+        <input type="radio" name="group1" id='node-input-subscribe' style='display: inline-block; width: auto; vertical-align: top;'>
+        <label for='node-input-subscribe' style='width: 70%;'>Subscription (interval- or event-based)</label>
+    </div>
+    <div class='form-row node-input-poll'>
+        <label>&nbsp;</label>
+        <input type="checkbox" name="group1" id='node-input-poll' style='display: inline-block; width: auto; vertical-align: top;'>
+        <label for='node-input-poll' style='width: 70%;'>Poll historical data (from an existing subscription)</label>
+    </div>-->
+    <div class="form-row node-input-ttl">
+        <label for="node-input-ttl"><i class="fa fa-history"></i> TTL</label> <span data-i18n="ttl"></span></label>
+        <input type="text" id="node-input-ttl" placeholder="">
+    </div>
+    <div class="form-row node-input-interval">
+        <label for="node-input-interval"><i class="fa fa-history"></i> Interval</label> <span data-i18n="toto"></span></label>
+        <input type="text" id="node-input-interval" placeholder="Set interval to '-1' to subscribe FOREVER">
+    </div>
+    <div class="form-row node-input-callback">
+        <label for="node-input-callback"><i class="fa fa-assistive-listening-systems"></i> Callback</label> <span data-i18n="toto"></span></label>
+        <input type="text" id="node-input-callback">
+    </div>
+    <!--<div class="form-row node-input-newest">
+        <label for="node-input-newest"><i class="fa fa-inbox"></i> Newest</label> <span data-i18n="toto"></span></label>
+        <input type="text" id="node-input-newest">
+    </div>
+    <div class="form-row node-input-oldest">
+        <label for="node-input-oldest"><i class="fa fa-inbox"></i> Oldest</label> <span data-i18n="toto"></span></label>
+        <input type="text" id="node-input-oldest">
+    </div>-->
+    <div class="form-row node-input-lastvalues">
+        <label for="node-input-newest"><i class="fa fa-clock-o"></i> Newest</label> <span data-i18n="toto"></span></label>
+        <input type="text" id="node-input-newest" style="width:115px !important">
+        &nbsp;&nbsp;<label for="node-input-oldest"><i class="fa fa-clock-o"></i> Oldest</label> <span data-i18n="tutu"></span></label>
+        <input type="text" id="node-input-oldest" style="width:115px !important">
+    </div>
+    <div class="form-row node-input-dates">
+        <label for="node-input-begin"><i class="fa fa-clock-o"></i> Begin</label> <span data-i18n="toto"></span></label>
+        <input type="text" id="node-input-begin" style="width:115px !important">
+        &nbsp;&nbsp;<label for="node-input-end"><i class="fa fa-clock-o"></i> End</label> <span data-i18n="tutu"></span></label>
+        <input type="text" id="node-input-end" style="width:115px !important">
+    </div>
+    <div class="form-row node-input-value">
+        <label for="node-input-value"><i class="fa fa-inbox"></i> Value</label> <span data-i18n="tata"></span></label>
+        <input type="text" id="node-input-value">
+    </div>
+    <div class="form-row node-input-reqID">
+        <label for="node-input-reqID"><i class="fa fa-list-ol"></i> Request ID</label> <span data-i18n="toto"></span></label>
+        <input type="text" id="node-input-reqID">
+    </div>
+    <div class="form-row node-input-metadata">
+        <label for="node-input-metadata"><i class="fa fa-info-circle"></i> Metadata</label> <span data-i18n="toto"></span></label>
+        <input type="checkbox" id="node-input-metadata">
+    </div>
+    <div class="form-row node-input-message">
+        <label for="node-input-message"><i class="fa fa-assistive-listening-systems"></i> Raw request</label> <span data-i18n="toto"></span></label>
+        <input type="text" id="node-input-message" placeholder="Copy/Paste here the XML request">
+    </div>
+
+    <script>
+        $("#node-input-operations").change(function() {
+            var oper = $("#node-input-operations").val();
+            if (oper == "Read") {
+                $(".node-input-readTypes").show();
+                $(".node-input-ttl").hide();
+                $(".node-input-interval").hide();
+                $(".node-input-callback").hide();
+                $(".node-input-lastvalues").hide();
+                $(".node-input-dates").hide();
+                $(".node-input-value").hide();
+                $(".node-input-reqID").hide();
+                $(".node-input-metadata").hide();
+                $(".node-input-message").hide();
+            } else if (oper == "Write") {
+                $("#node-input-readTypes").val("false");
+                $(".node-input-readTypes").hide();
+                $(".node-input-ttl").show();
+                $(".node-input-interval").hide();
+                $(".node-input-callback").hide();
+                $(".node-input-lastvalues").hide();
+                $(".node-input-dates").hide();
+                $(".node-input-value").show();
+                $(".node-input-reqID").hide();
+                $(".node-input-metadata").hide();
+                $(".node-input-message").hide();
+            } else if (oper == "Cancel") {
+                $("#node-input-readTypes").val("false");
+                $(".node-input-readTypes").hide();
+                $(".node-input-ttl").show();
+                $(".node-input-interval").hide();
+                $(".node-input-callback").hide();
+                $(".node-input-lastvalues").hide();
+                $(".node-input-dates").hide();
+                $(".node-input-value").hide();
+                $(".node-input-reqID").show();
+                $(".node-input-metadata").hide();
+                $(".node-input-message").hide();
+            } else if (oper == "Message") {
+                $("#node-input-readTypes").val("false");
+                $(".node-input-readTypes").hide();
+                $(".node-input-ttl").hide();
+                $(".node-input-interval").hide();
+                $(".node-input-callback").hide();
+                $(".node-input-lastvalues").hide();
+                $(".node-input-dates").hide();
+                $(".node-input-value").hide();
+                $(".node-input-reqID").hide();
+                $(".node-input-metadata").hide();
+                $(".node-input-message").show();
+            }
+        });
+        $("#node-input-readTypes").change(function() {
+            var oper_read = $("#node-input-readTypes").val();
+            if (oper_read == "read1time") {
+                $(".node-input-ttl").show();
+                $(".node-input-interval").hide();
+                $(".node-input-callback").hide();
+                $(".node-input-lastvalues").show();
+                $(".node-input-dates").show();
+                $(".node-input-value").hide();
+                $(".node-input-reqID").hide();
+                $(".node-input-metadata").show();
+                $(".node-input-message").hide();
+            } else if (oper_read == "subscribe") {
+                $(".node-input-ttl").show();
+                $(".node-input-interval").show();
+                $(".node-input-callback").show();
+                $(".node-input-lastvalues").hide();
+                $(".node-input-dates").hide();
+                $(".node-input-value").hide();
+                $(".node-input-reqID").hide();
+                $(".node-input-metadata").hide();
+                $(".node-input-message").hide();
+            } else if (oper_read == "poll") {
+                $(".node-input-ttl").hide();
+                $(".node-input-interval").hide();
+                $(".node-input-callback").hide();
+                $(".node-input-lastvalues").hide();
+                $(".node-input-dates").hide();
+                $(".node-input-value").hide();
+                $(".node-input-reqID").show();
+                $(".node-input-metadata").hide();
+                $(".node-input-message").hide();
+            }
+        });
+    </script>
+</script>
+
+
+<script type="text/x-red" data-help-name="omiNode">
+    <p>A simple node that TO BE COMPLETED</p>
+</script>
+
+
+
+<!--
+<script type="text/javascript">
+    console.log("registering OMI config node");
+        RED.nodes.registerType('configNodeOMI',{
+            category: 'config',
+            defaults: {
+                client_token: {value:"",required:true},
+                username: {value:"",required:true},
+                password: {value:"",required:true},
+            },
+            label: function() {
+                return "omi node: "+this.username;
+            }
+        });
+
+</script>
+
+
+<script type="text/x-red" data-template-name="configNodeOMI">
+    <div class="form-row">
+        <label for="node-input-client_token"><i class="icon-tag"></i> Client Token</label>
+        <input type="text" id="node-config-input-client_token" placeholder="56e984c449c7...">
+    </div>
+   <div class="form-row">
+        <label for="node-input-username"><i class="icon-tag"></i> Username</label>
+        <input type="text" id="node-config-input-username" placeholder="your@email.com">
+    </div>
+   <div class="form-row">
+        <label for="node-input-password"><i class="icon-tag"></i> Password</label>
+        <input type="text" id="node-config-input-password" placeholder="your IoTBnB Password">
+    </div>
+</script>
+-->
