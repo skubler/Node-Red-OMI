@@ -7,9 +7,9 @@
         color: '#00AFF0',
         defaults: {
             name: {value:""},
-            path_InfoItem: {value:"", required:true},
+            path_InfoItem: {value:""},
             token: {value:""},
-            operations: {value:"", required:true},
+            operations: {value:""},
             ttl: {value:""},
             interval: {value:""},
             callback: {value:""},
@@ -80,7 +80,7 @@
             <option value="Read">Read</option>
             <option value="Write">Write</option>
             <option value="Cancel">Cancel existing subcription</option>
-            <option value="Message">Raw request</option>
+            <option value="built4WS">Build Request</option>
         </select>
     </div>
     <div class="form-row node-input-readTypes">
@@ -151,10 +151,10 @@
         <label for="node-input-metadata"><i class="fa fa-info-circle"></i> Metadata</label> <span data-i18n="toto"></span></label>
         <input type="checkbox" id="node-input-metadata">
     </div>
-    <div class="form-row node-input-message">
+    <!--<div class="form-row node-input-message">
         <label for="node-input-message"><i class="fa fa-assistive-listening-systems"></i> Raw request</label> <span data-i18n="toto"></span></label>
         <input type="text" id="node-input-message" placeholder="Copy/Paste here the XML request">
-    </div>
+    </div>-->
 
     <script>
         $("#node-input-operations").change(function() {
@@ -169,7 +169,7 @@
                 $(".node-input-value").hide();
                 $(".node-input-reqID").hide();
                 $(".node-input-metadata").hide();
-                $(".node-input-message").hide();
+                //$(".node-input-message").hide();
             } else if (oper == "Write") {
                 $("#node-input-readTypes").val("false");
                 $(".node-input-readTypes").hide();
@@ -181,7 +181,7 @@
                 $(".node-input-value").show();
                 $(".node-input-reqID").hide();
                 $(".node-input-metadata").hide();
-                $(".node-input-message").hide();
+                //$(".node-input-message").hide();
             } else if (oper == "Cancel") {
                 $("#node-input-readTypes").val("false");
                 $(".node-input-readTypes").hide();
@@ -193,7 +193,7 @@
                 $(".node-input-value").hide();
                 $(".node-input-reqID").show();
                 $(".node-input-metadata").hide();
-                $(".node-input-message").hide();
+                //$(".node-input-message").hide();
             } else if (oper == "Message") {
                 $("#node-input-readTypes").val("false");
                 $(".node-input-readTypes").hide();
@@ -205,7 +205,7 @@
                 $(".node-input-value").hide();
                 $(".node-input-reqID").hide();
                 $(".node-input-metadata").hide();
-                $(".node-input-message").show();
+                //$(".node-input-message").show();
             }
         });
         $("#node-input-readTypes").change(function() {
@@ -219,7 +219,7 @@
                 $(".node-input-value").hide();
                 $(".node-input-reqID").hide();
                 $(".node-input-metadata").show();
-                $(".node-input-message").hide();
+                //$(".node-input-message").hide();
             } else if (oper_read == "subscribe") {
                 $(".node-input-ttl").show();
                 $(".node-input-interval").show();
@@ -229,7 +229,7 @@
                 $(".node-input-value").hide();
                 $(".node-input-reqID").hide();
                 $(".node-input-metadata").hide();
-                $(".node-input-message").hide();
+                //$(".node-input-message").hide();
             } else if (oper_read == "poll") {
                 $(".node-input-ttl").hide();
                 $(".node-input-interval").hide();
@@ -239,7 +239,7 @@
                 $(".node-input-value").hide();
                 $(".node-input-reqID").show();
                 $(".node-input-metadata").hide();
-                $(".node-input-message").hide();
+                //$(".node-input-message").hide();
             }
         });
     </script>
@@ -247,7 +247,20 @@
 
 
 <script type="text/x-red" data-help-name="omiNode">
-    <p>A simple node that TO BE COMPLETED</p>
+    <p>path_InfoItem= n.path_InfoItem || msg.path_InfoItem;
+                token= n.token || msg.token;
+                operations= n.operations || msg.operations;
+                ttl= n.ttl || msg.ttl;
+                interval= n.interval || msg.interval;
+                callback= n.callback || msg.callback;
+                newest= n.newest || msg.newest;
+                oldest= n.oldest || msg.oldest;
+                begin= n.begin || msg.begin;
+                end= n.end || msg.end;
+                value= n.value || msg.value;
+                reqID= n.reqID || msg.reqID;
+                metadata= n.metadata || msg.metadata;
+                readTypes= n.readTypes || msg.readTypes;</p>
 </script>
 
 

@@ -65,6 +65,7 @@ util.inherits(omiNodecons, EventEmitter);
 */
 omiNodecons.prototype.ReadInfoItem = function (options, oper_type, callback) {
   var xmlmsg_omiodf, xmlmsg_odf;
+  var DOMParser = require('xmldom').DOMParser;
 
   if (oper_type=="read1time" || oper_type=="subscribe"){
    if (oper_type=="read1time" && options.metadata){
@@ -102,12 +103,19 @@ request({
     //form: form,
   }, function (err, response, body_resp) {
 console.log("tttttttttttttt");
-    console.log(body_resp);
-    console.log("ssssssssssss");
-    var path_check = body_resp.split('Such item/s not found.');
+    /*console.log(body_resp);
+    console.log("ssssssssssss");*/
+    parser = new DOMParser();
+    xmlDoc = parser.parseFromString(body_resp,"text/xml");
+    var err_odf=xmlDoc.getElementsByTagName("omi:result")[0].childNodes[0].getAttribute("returnCode");
+    //console.log(err_odf);
+    //.getAttribute("returnCode");
+     //console.log(err_odf);
+    //var path_check = body_resp.split('Such item/s not found.');
     
-    if (path_check.length>1){
-      xmlmsg_omiodf = '<?xml version="1.0"?><omi:omiEnvelope xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xmlns:omi="omi.xsd" version="1.0" ttl="0"><omi:read msgformat="odf"><omi:msg><Objects xmlns="odf.xsd"><Object><id>Haut_Fourneaux_Site_1</id><Object><id>Kuka_Robots</id><Object><id>KR_6_R700_sixx_WP</id><Object><id>Sensors</id><InfoItem name="Motor_speed"/></Object></Object></Object></Object></Objects></omi:msg></omi:read></omi:omiEnvelope>';
+    if (err_odf == 400 || err_odf == 404){
+      //console.log("8888888888888888888888");
+      //xmlmsg_omiodf = '<?xml version="1.0"?><omi:omiEnvelope xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xmlns:omi="omi.xsd" version="1.0" ttl="0"><omi:read msgformat="odf"><omi:msg><Objects xmlns="odf.xsd"><Object><id>Haut_Fourneaux_Site_1</id><Object><id>Kuka_Robots</id><Object><id>KR_6_R700_sixx_WP</id><Object><id>Sensors</id><InfoItem name="Motor_speed"/></Object></Object></Object></Object></Objects></omi:msg></omi:read></omi:omiEnvelope>';
       //console.log(path_check.length);
       
       //------------------Send 2nd request if code error indicating that the InfoItem doesn't exist----------------------//
@@ -115,12 +123,11 @@ console.log("tttttttttttttt");
       xmlmsg_odf = createODF_Read(options.path_InfoItem,"Object");
       xmlmsg_omiodf = createOMIODF_Read(options,oper_type,xmlmsg_odf.payload);
 
-      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      /*console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       console.log(xmlmsg_odf);
-      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");*/
 
       request({
-
         url: url_ominode,
         method: "POST",
         headers: {
@@ -130,13 +137,13 @@ console.log("tttttttttttttt");
     //form: form,
   }, function (err, response, body_resp) {
 
-    console.log(body_resp);
+    //console.log(body_resp);
     var path_check = body_resp.split('Such item/s not found.');
     
     if (path_check.length>1){
       //console.log("-----------------------------------------------------");
     } else{
-      console.log("It works now!!");
+      console.log("It works now!! (needed to create a 2nd request without InfoItem (object as the lowest hierarchy level))");
     }
     //body = JSON.parse(body);
 
@@ -144,7 +151,7 @@ console.log("tttttttttttttt");
     this.emit(err, body_resp);
 
     if (callback) {
-      console.log(body_resp);
+      //console.log(body_resp);
       return callback(err, body_resp);
     }
 
@@ -155,16 +162,16 @@ console.log("tttttttttttttt");
     
     //--------Catch error of the 1st request if code !=200 (since anyway the error code of the 2nd request will be displayed in the UI)--//
 
-    if (err || response.statusCode != 200) {
-      console.log("))))))))))))");
-      console.log(body_resp);
+    if (err || err_odf != 200) {
+      //console.log("))))))))))))");
+      //console.log(body_resp);
       return this.handleRequestError(err, response, body_resp, "getUser error");
     }
     //console.log(body.body);
     this.emit(err, body_resp);
 
     if (callback) {
-      console.log(body_resp);
+      //console.log(body_resp);
       return callback(err, body_resp);
     }
 
@@ -271,6 +278,36 @@ omiNodecons.prototype.WriteInfoItem = function (options, callback) {
 
    return this;
  };
+
+
+/*Creation of the O-MI/O-DF message when performing a Read (read1time) request whose input parameters are contained in:
+@options: all necessary paramters (e.g., TTL, newest, oldest...) entered via Node-Red UI
+*/
+omiNodecons.prototype.BuiltReqWs = function (options, oper_type) {
+  var xmlmsg_omiodf, xmlmsg_odf;
+  var DOMParser = require('xmldom').DOMParser;
+
+  if (oper_type=="read1time" || oper_type=="subscribe"){
+   if (oper_type=="read1time" && options.metadata){
+    xmlmsg_odf = createODF_ReadwithMetadata(options.path_InfoItem);
+  }else{
+    //console.log("createODF_Read(options.path_InfoItem)");
+    xmlmsg_odf = createODF_Read(options.path_InfoItem,"InfoItem");
+  }
+  xmlmsg_omiodf = createOMIODF_Read(options,oper_type,xmlmsg_odf.payload);
+} else if(oper_type=="poll"){
+ xmlmsg_odf = createODF_poll(options.reqID);
+ xmlmsg_omiodf = createOMIODF_Read_poll(options,xmlmsg_odf.payload);
+}else{
+  xmlmsg_omiodf="The requested operation is neither 'read1time' nor 'subscription' nor 'poll'";
+}
+console.log("1*********");
+console.log(xmlmsg_omiodf);
+console.log("2*********");
+
+    return xmlmsg_omiodf;
+};
+
 
 /***************************************************************************
 *****************        CREATE O-MI HEADER/FOOTER       ********************
